@@ -380,6 +380,41 @@
   .sendbtn.stop{background:var(--warn)}
   .cnote{font-size:11px;color:var(--ink-3);margin-top:7px;text-align:center}
 
+  /* IA con internet */
+  .ckey{margin-left:auto;width:32px;height:32px;border-radius:8px;color:var(--ink-3);
+    display:flex;align-items:center;justify-content:center}
+  .ckey svg{width:18px;height:18px}
+  .ckey:hover,.ckey[aria-expanded="true"]{color:var(--amber-ink);background:var(--amber-wash)}
+  .ckey + .cclose{margin-left:0}
+  .chead .mode{cursor:pointer}
+  .chead .mode.web{background:var(--steel-wash);color:var(--steel)}
+  .cset{display:flex;flex-direction:column;gap:8px;padding:12px 14px 14px;
+    border-bottom:1px solid var(--rule);background:var(--surface)}
+  .cset[hidden],.cset [hidden]{display:none}
+  .cset b{font-family:"Archivo",sans-serif;font-variation-settings:"wdth" 108,"wght" 730;font-size:14px}
+  .cset p{margin:0;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+  .cset a{color:var(--amber-ink);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+  .cset input{border:1px solid var(--rule-strong);border-radius:9px;padding:9px 11px;
+    background:var(--ground);font-family:"IBM Plex Mono",monospace}
+  .cset input:focus{border-color:var(--amber)}
+  .cset-btns{display:flex;gap:8px;flex-wrap:wrap}
+  .cset-save{background:var(--amber);color:#fff;font-weight:600;font-size:13.5px;padding:8px 18px;border-radius:999px}
+  .cset-save:disabled{opacity:.6;cursor:wait}
+  :root[data-theme="dark"] .cset-save{color:#14110C}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cset-save{color:#14110C}}
+  .cset-del{font-size:13px;font-weight:600;color:var(--warn);padding:8px 14px;border-radius:999px;
+    border:1px solid var(--rule-strong)}
+  .cset p.cset-st{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3)}
+  .cset p.cset-st:empty{display:none}
+  .cset p.cset-st.ok{color:var(--steel)}
+  .cset p.cset-st.err{color:var(--warn)}
+  .msg .srcs{display:flex;flex-direction:column;gap:4px;margin-top:10px;padding-top:8px;
+    border-top:1px solid var(--rule-strong);white-space:normal}
+  .msg .srcs span{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.08em;
+    text-transform:uppercase;font-weight:600;color:var(--ink-3)}
+  .msg .srcs a{font-size:12.5px;line-height:1.35;color:var(--amber-ink);text-decoration:underline;
+    text-underline-offset:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
 
   /* viscosity grid */
   .vgrid{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
@@ -533,7 +568,7 @@
     <button class="dclose" id="dclose" aria-label="Cerrar menú">&times;</button>
   </div>
   <nav class="dnav" id="dnav"></nav>
-  <div class="dver">Versión <b>17</b> · 18-09-2026</div>
+  <div class="dver">Versión <b>18</b> · 18-09-2026</div>
 </aside>
 
 <main id="main">
@@ -3867,7 +3902,21 @@
   <div class="chead">
     <b>Asistente Austrofil</b>
     <span class="mode" id="cmode">Manual</span>
+    <button class="ckey" id="ckey" aria-label="IA con internet: configurar la clave" title="IA con internet" aria-expanded="false" aria-controls="cset">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.85 12.15L19 4"/><path d="M18 5l2 2"/><path d="M15 8l2 2"/></svg>
+    </button>
     <button class="cclose" id="cclose" aria-label="Cerrar">&times;</button>
+  </div>
+  <div class="cset" id="cset" hidden>
+    <b>IA con búsqueda en internet</b>
+    <p>Pega tu clave de API de Claude. Se guarda solo en este navegador: no se sube al repositorio ni la ve nadie más.</p>
+    <input id="ckeyin" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…" aria-label="Clave de API de Claude">
+    <div class="cset-btns">
+      <button class="cset-save" id="ckeysave">Guardar</button>
+      <button class="cset-del" id="ckeydel" hidden>Quitar clave</button>
+    </div>
+    <p class="cset-st" id="ckeyst" role="status"></p>
+    <p>La clave se crea en <a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener">platform.claude.com</a>. Cada respuesta se descuenta de tu saldo allí, normalmente unos centavos.</p>
   </div>
   <div class="chatlog" id="chatlog">
     <div class="msg bot">Pregúntame lo que quieras: normas, viscosidades, marcas, filtros, grasas, frenos, baterías, objeciones de mostrador.</div>
@@ -4573,6 +4622,277 @@
   var sampleFn;          // undefined = sin resolver, null = no disponible
   var busy = false, ctl = null;
 
+  /* ============ IA CON BÚSQUEDA WEB (clave guardada solo en este navegador) ============ */
+  var API_URL = "https://api.anthropic.com/v1/";
+  var API_MODEL = "claude-sonnet-5";
+  var KEY_STORE = "austrofil.claudeKey";
+  function loadKey(){ try { return localStorage.getItem(KEY_STORE) || ""; } catch (e){ return ""; } }
+  function storeKey(k){
+    try { if (k) localStorage.setItem(KEY_STORE, k); else localStorage.removeItem(KEY_STORE); return true; }
+    catch (e){ return false; }
+  }
+  var apiKey = loadKey();
+
+  function setMode(){
+    cmode.classList.remove("ia", "web");
+    if (apiKey){ cmode.textContent = "IA + web"; cmode.classList.add("web"); }
+    else if (sampleFn){ cmode.textContent = "IA"; cmode.classList.add("ia"); }
+    else cmode.textContent = "Manual";
+  }
+
+  function apiHeaders(k){
+    return { "content-type": "application/json", "x-api-key": k,
+             "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" };
+  }
+
+  function webSystem(){
+    var hoy = new Date().toLocaleDateString("es-EC", { day: "numeric", month: "long", year: "numeric" });
+    return CONTEXTO + "\n\n" + [
+      "FECHA: hoy es " + hoy + ".",
+      "BÚSQUEDA WEB: puedes buscar en internet. Hazlo cuando la pregunta pida datos que no están arriba: fichas técnicas y homologaciones de productos, lo que recomienda el fabricante de un vehículo, normas nuevas, noticias o datos de mercado. Si lo de arriba alcanza, responde sin buscar.",
+      "Prefiere fuentes oficiales (fabricantes de lubricantes, filtros, baterías y vehículos; API, SAE, JASO, ACEA) antes que foros o tiendas. Si las fuentes no coinciden o no puedes confirmar un dato, dilo.",
+      "No anuncies que vas a buscar: responde directo. Escribe en texto plano, sin markdown (nada de asteriscos, # ni tablas); si necesitas una lista, usa guiones."
+    ].join("\n");
+  }
+
+  function webTool(){
+    return { type: "web_search_20250305", name: "web_search", max_uses: 3,
+             user_location: { type: "approximate", city: "Cuenca", region: "Azuay",
+                              country: "EC", timezone: "America/Guayaquil" } };
+  }
+
+  function apiError(status, body){
+    var er = (body && body.error) || {};
+    var e = new Error(er.message || ("HTTP " + status));
+    e.status = status; e.type = er.type || "";
+    return e;
+  }
+
+  function webErrorText(e){
+    var m = String((e && e.message) || "").toLowerCase();
+    if (e.type === "empty") return COPY.empty_completion;
+    if (e.status === 401 || e.type === "authentication_error")
+      return "La clave de API no es válida. Revísala con el botón de la llave, arriba a la derecha.";
+    if (/credit balance|billing/.test(m))
+      return "Se agotó tu saldo en la Consola de Claude. Recarga crédito para seguir usando la IA.";
+    if (/web.?search/.test(m) && /enabl|disabl|not allowed|permission|organi[sz]ation/.test(m))
+      return "La búsqueda web no está activada en tu cuenta de la API. Actívala en la Consola de Claude (Settings › Privacy).";
+    if (e.status === 403 || e.type === "permission_error")
+      return "Tu clave no tiene permiso para esto. Revísala en la Consola de Claude.";
+    if (e.status === 429 || e.type === "rate_limit_error") return COPY.rate_limited;
+    if (e.status === 529 || e.type === "overloaded_error") return "Claude está saturado en este momento. Intenta en un rato.";
+    if (e.status === 404 || e.type === "not_found_error") return "El modelo de IA configurado no está disponible para tu cuenta.";
+    if (!e.status) return "No hay conexión con Claude. Respondo con el manual.";
+    if (e.status >= 500) return COPY.upstream_error;
+    return "No pude consultar a Claude: " + (e.message || e.status);
+  }
+
+  /* una llamada en streaming; devuelve los bloques para poder continuar un pause_turn */
+  async function streamWeb(messages, out, signal, st){
+    var res = await fetch(API_URL + "messages", {
+      method: "POST", signal: signal, headers: apiHeaders(apiKey),
+      body: JSON.stringify({
+        model: API_MODEL, max_tokens: 4096, stream: true,
+        system: [{ type: "text", text: webSystem(), cache_control: { type: "ephemeral" } }],
+        messages: messages, tools: [webTool()]
+      })
+    });
+    if (!res.ok){
+      var body = null;
+      try { body = await res.json(); } catch (_){}
+      throw apiError(res.status, body);
+    }
+    var blocks = [], stop = null, reader = res.body.getReader(), dec = new TextDecoder(), buf = "";
+
+    function status(t){ if (!st.text){ out.classList.add("dots"); out.textContent = t; } }
+    function onEvent(ev){
+      var b, d;
+      if (ev.type === "content_block_start"){
+        b = JSON.parse(JSON.stringify(ev.content_block || {}));
+        if (b.type === "server_tool_use"){ b._json = ""; st.afterTool = true; status("Buscando en internet…"); }
+        if (b.type === "web_search_tool_result"){
+          st.afterTool = true;
+          if (Array.isArray(b.content)) b.content.forEach(function(r){
+            if (r && r.url) st.results.push({ url: r.url, title: r.title });
+          });
+        }
+        if (b.type === "text" && Array.isArray(b.citations)) b.citations.forEach(function(c){ st.cites.push(c); });
+        blocks[ev.index] = b;
+      } else if (ev.type === "content_block_delta"){
+        b = blocks[ev.index]; d = ev.delta || {};
+        if (!b) return;
+        if (d.type === "text_delta"){
+          if (st.afterTool && st.text && !/\s$/.test(st.text)) st.text += "\n\n";
+          st.afterTool = false;
+          b.text = (b.text || "") + d.text;
+          st.text += d.text;
+          out.classList.remove("dots");
+          out.textContent = st.text;
+          chatlog.scrollTop = chatlog.scrollHeight;
+        } else if (d.type === "input_json_delta"){
+          b._json += d.partial_json || "";
+        } else if (d.type === "citations_delta" && d.citation){
+          (b.citations = b.citations || []).push(d.citation);
+          st.cites.push(d.citation);
+        } else if (d.type === "thinking_delta"){
+          b.thinking = (b.thinking || "") + (d.thinking || "");
+        } else if (d.type === "signature_delta"){
+          b.signature = d.signature;
+        }
+      } else if (ev.type === "content_block_stop"){
+        b = blocks[ev.index];
+        if (b && b.type === "server_tool_use"){
+          try { b.input = JSON.parse(b._json || "{}"); } catch (_){ b.input = {}; }
+          delete b._json;
+          if (b.input && b.input.query) status("Buscando en internet: “" + b.input.query + "”…");
+        }
+      } else if (ev.type === "message_delta"){
+        if (ev.delta && ev.delta.stop_reason) stop = ev.delta.stop_reason;
+      } else if (ev.type === "error"){
+        throw apiError(ev.error && ev.error.type === "overloaded_error" ? 529 : 500, ev);
+      }
+    }
+    function feed(chunk){
+      var data = chunk.split("\n").filter(function(l){ return l.indexOf("data:") === 0; })
+        .map(function(l){ return l.slice(5).replace(/^ /, ""); }).join("\n");
+      if (!data) return;
+      var ev;
+      try { ev = JSON.parse(data); } catch (_){ return; }
+      onEvent(ev);
+    }
+    for (;;){
+      var r = await reader.read();
+      if (r.done) break;
+      buf += dec.decode(r.value, { stream: true }).replace(/\r/g, "");
+      var parts = buf.split("\n\n");
+      buf = parts.pop();
+      for (var i = 0; i < parts.length; i++) feed(parts[i]);
+    }
+    if (buf.trim()) feed(buf);
+    var content = blocks.filter(Boolean).map(function(b){
+      if (b.type === "text" && !(b.citations && b.citations.length)) delete b.citations;
+      return b;
+    });
+    return { stop: stop, content: content };
+  }
+
+  function addSources(el, st){
+    var list = st.cites.length ? st.cites : st.results.slice(0, 3);
+    var seen = {}, pick = [];
+    list.forEach(function(c){
+      if (!c || !c.url || seen[c.url] || !/^https?:\/\//i.test(c.url)) return;
+      seen[c.url] = 1;
+      pick.push({ url: c.url, title: c.title || "" });
+    });
+    if (!pick.length) return;
+    var box = document.createElement("div");
+    box.className = "srcs";
+    var lab = document.createElement("span");
+    lab.textContent = st.cites.length ? "Fuentes" : "Resultados consultados";
+    box.appendChild(lab);
+    pick.slice(0, 4).forEach(function(p){
+      var a = document.createElement("a"), host = p.url;
+      try { host = new URL(p.url).hostname.replace(/^www\./, ""); } catch (_){}
+      a.href = p.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+      a.textContent = host + (p.title ? " · " + p.title : "");
+      a.title = p.url;
+      box.appendChild(a);
+    });
+    el.appendChild(box);
+    chatlog.scrollTop = chatlog.scrollHeight;
+  }
+
+  async function askWebTurn(text){
+    turns.push({ role: "user", content: text });
+    while (turns.length > 10 || (turns.length && turns[0].role !== "user")) turns.shift();
+    var out = bubble("bot", "Pensando…");
+    out.classList.add("dots");
+    setBusy(true);
+    ctl = new AbortController();
+    var st = { text: "", afterTool: false, cites: [], results: [] };
+    try {
+      var base = turns.slice(), acc = [], res, rounds = 0;
+      for (;;){
+        res = await streamWeb(acc.length ? base.concat([{ role: "assistant", content: acc }]) : base,
+                              out, ctl.signal, st);
+        if (res.stop !== "pause_turn" || rounds >= 2) break;
+        acc = acc.concat(res.content);
+        rounds++;
+      }
+      var answer = st.text.trim();
+      if (!answer) throw apiError(0, { error: { type: "empty", message: "respuesta vacía" } });
+      if (res.stop === "max_tokens" || res.stop === "pause_turn") answer += "…";
+      out.classList.remove("dots");
+      out.textContent = answer;
+      addSources(out, st);
+      turns.push({ role: "assistant", content: answer });
+    } catch (e){
+      turns.pop();
+      if ((e && e.name === "AbortError") || (ctl && ctl.signal.aborted)){
+        if (st.text){ out.classList.remove("dots"); out.textContent = st.text.trim() + " …(detenido)"; }
+        else out.remove();
+      } else {
+        out.remove();
+        bubble("sys", webErrorText(e || {}));
+        localReply(text);
+      }
+    } finally {
+      setBusy(false); ctl = null;
+      chatlog.scrollTop = chatlog.scrollHeight;
+    }
+  }
+
+  /* panel de la clave */
+  var ckey = document.getElementById("ckey"), cset = document.getElementById("cset"),
+      ckeyin = document.getElementById("ckeyin"), ckeysave = document.getElementById("ckeysave"),
+      ckeydel = document.getElementById("ckeydel"), ckeyst = document.getElementById("ckeyst");
+
+  function maskKey(k){ return k.slice(0, 10) + "…" + k.slice(-4); }
+  function keyMsg(t, cls){ ckeyst.textContent = t || ""; ckeyst.className = "cset-st" + (cls ? " " + cls : ""); }
+  function syncSet(){
+    ckeydel.hidden = !apiKey;
+    ckeyin.value = "";
+    ckeyin.placeholder = apiKey ? maskKey(apiKey) : "sk-ant-…";
+    keyMsg(apiKey ? "Clave activa en este navegador: el chat busca en internet."
+                  : "Sin clave: el chat responde solo con el manual.", apiKey ? "ok" : "");
+  }
+  function toggleSet(open){
+    var on = typeof open === "boolean" ? open : cset.hidden;
+    cset.hidden = !on;
+    ckey.setAttribute("aria-expanded", on ? "true" : "false");
+    if (on){ syncSet(); setTimeout(function(){ ckeyin.focus(); }, 60); }
+  }
+  async function saveKey(){
+    var k = (ckeyin.value || "").replace(/\s+/g, "");
+    if (!k){ keyMsg("Pega la clave primero.", "err"); return; }
+    if (!/^sk-ant-[A-Za-z0-9_-]{20,}$/.test(k)){ keyMsg("Eso no parece una clave de Claude: empieza con sk-ant-.", "err"); return; }
+    ckeysave.disabled = true;
+    keyMsg("Verificando la clave…");
+    var verdict = "unknown";
+    try {
+      var r = await fetch(API_URL + "models?limit=1", { headers: apiHeaders(k) });
+      verdict = r.ok ? "ok" : (r.status === 401 || r.status === 403) ? "bad" : "unknown";
+    } catch (_){}
+    ckeysave.disabled = false;
+    if (verdict === "bad"){ keyMsg("La Consola rechazó la clave. Cópiala de nuevo, completa.", "err"); return; }
+    apiKey = k;
+    var kept = storeKey(k);
+    setMode(); syncSet();
+    keyMsg((verdict === "ok" ? "Clave verificada y guardada." :
+            "Clave guardada. No pude verificarla ahora; se probará con la primera pregunta.") +
+           (kept ? "" : " Ojo: este navegador no permite guardarla y se perderá al cerrar la página."), "ok");
+  }
+  ckey.addEventListener("click", function(){ toggleSet(); });
+  cmode.addEventListener("click", function(){ toggleSet(true); });
+  ckeysave.addEventListener("click", saveKey);
+  ckeyin.addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); saveKey(); } });
+  ckeydel.addEventListener("click", function(){
+    apiKey = ""; storeKey(""); turns = [];
+    setMode(); syncSet();
+    keyMsg("Clave borrada de este navegador. El chat vuelve al modo Manual.");
+  });
+  setMode();
+
   function openChat(){
     panel.classList.add("on");
     fab.style.display = "none";
@@ -4592,7 +4912,7 @@
     if (typeof window.claude !== "undefined" && window.claude && window.claude.use){
       window.claude.use("sample").then(function(fn){
         sampleFn = fn || null;
-        if (sampleFn){ cmode.textContent = "IA"; cmode.classList.add("ia"); }
+        setMode();
       }).catch(function(){ sampleFn = null; });
     }
   }
@@ -4658,6 +4978,8 @@
     bubble("me", text);
     chatin.value = ""; autosize();
 
+    if (!cset.hidden) toggleSet(false);
+    if (apiKey){ await askWebTurn(text); return; }
     if (!sampleFn){ localReply(text); return; }
 
     turns.push({ role: "user", content: text });
@@ -4686,7 +5008,7 @@
         bubble("sys", (e && COPY[e.code]) || COPY.upstream_error);
         if (e && (e.code === "not_granted" || e.code === "sampling_disabled" ||
                   e.code === "not_declared" || e.code === "capability_disabled")){
-          sampleFn = null; cmode.textContent = "Manual"; cmode.classList.remove("ia");
+          sampleFn = null; setMode();
         }
         localReply(text);
       }
