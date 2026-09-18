@@ -415,6 +415,29 @@
   .msg .srcs a{font-size:12.5px;line-height:1.35;color:var(--amber-ink);text-decoration:underline;
     text-underline-offset:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
+  /* el asistente lleva la gota de Austrofil */
+  .fab{width:54px;height:68px;border-radius:0;background:none;box-shadow:none;
+    filter:drop-shadow(0 4px 7px rgba(25,28,25,.32))}
+  .fab svg{width:54px;height:68px;overflow:visible}
+  .fab .fab-drop{fill:var(--amber)}
+  .fab .fab-ico{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .chead .cdrop{width:13px;height:16px;flex:0 0 auto;fill:none;stroke:var(--amber);stroke-width:2.6;margin-right:-3px}
+  .ckey[hidden] + .cclose{margin-left:auto}
+  .msg .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;white-space:normal}
+  .msg .chip{display:inline-flex;align-items:center;font-size:12.5px;font-weight:600;line-height:1.2;
+    color:var(--ink-2);background:var(--surface);border:1px solid var(--rule-strong);border-radius:999px;
+    padding:5px 11px;text-decoration:none}
+  .msg .chip:hover{border-color:var(--amber);color:var(--amber-ink)}
+  .msg .chip.ia{color:var(--amber-ink);border-color:var(--amber)}
+  .msg .chip:disabled{opacity:.5;cursor:default}
+  .cset-opt{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border:1px solid var(--rule);
+    border-radius:10px;background:var(--ground)}
+  .cset .cset-opt p b{font-family:inherit;font-size:inherit;font-weight:600;color:var(--ink)}
+  .cset a.cset-open{align-self:flex-start;background:var(--amber);color:#fff;font-weight:600;font-size:13.5px;
+    padding:8px 16px;border-radius:999px;text-decoration:none}
+  :root[data-theme="dark"] .cset a.cset-open{color:#14110C}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cset a.cset-open{color:#14110C}}
+
 
   /* viscosity grid */
   .vgrid{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
@@ -568,7 +591,7 @@
     <button class="dclose" id="dclose" aria-label="Cerrar menú">&times;</button>
   </div>
   <nav class="dnav" id="dnav"></nav>
-  <div class="dver">Versión <b>18</b> · 18-09-2026</div>
+  <div class="dver">Versión <b>19</b> · 18-09-2026</div>
 </aside>
 
 <main id="main">
@@ -3895,28 +3918,37 @@
 </div>
 
 <button class="fab" id="fab" aria-label="Abrir el asistente">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-9 8.4 8.6 8.6 0 01-3.8-.9L3 21l2-4.8A8.4 8.4 0 0112 3a8.4 8.4 0 019 8.5z"/></svg>
+  <svg viewBox="0 0 48 60" aria-hidden="true">
+    <path class="fab-drop" d="M24 2C24 2 4 26 4 39A20 20 0 0 0 44 39C44 26 24 2 24 2Z"/>
+    <path class="fab-ico" transform="translate(12.6 27.6) scale(.95)" d="M21 11.5a8.4 8.4 0 01-9 8.4 8.6 8.6 0 01-3.8-.9L3 21l2-4.8A8.4 8.4 0 0112 3a8.4 8.4 0 019 8.5z"/>
+  </svg>
 </button>
 
 <div class="chatpanel" id="chatpanel" role="dialog" aria-label="Asistente Austrofil">
   <div class="chead">
+    <svg class="cdrop" viewBox="0 0 24 30" aria-hidden="true"><path d="M12 1C12 1 2 13 2 19.5A10 10 0 0 0 22 19.5C22 13 12 1 12 1Z"/></svg>
     <b>Asistente Austrofil</b>
     <span class="mode" id="cmode">Manual</span>
-    <button class="ckey" id="ckey" aria-label="IA con internet: configurar la clave" title="IA con internet" aria-expanded="false" aria-controls="cset">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.85 12.15L19 4"/><path d="M18 5l2 2"/><path d="M15 8l2 2"/></svg>
+    <button class="ckey" id="ckey" aria-label="Respuestas con IA" title="Respuestas con IA" aria-expanded="false" aria-controls="cset">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M11 3C11.8 8 14 10.2 19 11C14 11.8 11.8 14 11 19C10.2 14 8 11.8 3 11C8 10.2 10.2 8 11 3Z"/><path d="M19 15.5C19.3 17.1 19.9 17.7 21.5 18C19.9 18.3 19.3 18.9 19 20.5C18.7 18.9 18.1 18.3 16.5 18C18.1 17.7 18.7 17.1 19 15.5Z"/></svg>
     </button>
     <button class="cclose" id="cclose" aria-label="Cerrar">&times;</button>
   </div>
   <div class="cset" id="cset" hidden>
-    <b>IA con búsqueda en internet</b>
-    <p>Pega tu clave de API de Claude. Se guarda solo en este navegador: no se sube al repositorio ni la ve nadie más.</p>
-    <input id="ckeyin" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…" aria-label="Clave de API de Claude">
-    <div class="cset-btns">
-      <button class="cset-save" id="ckeysave">Guardar</button>
-      <button class="cset-del" id="ckeydel" hidden>Quitar clave</button>
+    <b>Respuestas con IA</b>
+    <div class="cset-opt">
+      <p><b>Gratis con tu cuenta de Claude.</b> Abre el manual en Claude: el chat responde con IA usando tu plan, sin costo extra.</p>
+      <a class="cset-open" id="copenclaude" href="https://claude.ai/artifact/UPSgz7aZmEmrpQ7ddww993" target="_blank" rel="noopener">Abrir el manual en Claude ↗</a>
     </div>
-    <p class="cset-st" id="ckeyst" role="status"></p>
-    <p>La clave se crea en <a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener">platform.claude.com</a>. Cada respuesta se descuenta de tu saldo allí, normalmente unos centavos.</p>
+    <div class="cset-opt">
+      <p><b>Con búsqueda en internet (de pago).</b> Necesita una clave de API de <a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener">platform.claude.com</a>, que se paga aparte. Se guarda solo en este navegador.</p>
+      <input id="ckeyin" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…" aria-label="Clave de API de Claude">
+      <div class="cset-btns">
+        <button class="cset-save" id="ckeysave">Guardar</button>
+        <button class="cset-del" id="ckeydel" hidden>Quitar clave</button>
+      </div>
+      <p class="cset-st" id="ckeyst" role="status"></p>
+    </div>
   </div>
   <div class="chatlog" id="chatlog">
     <div class="msg bot">Pregúntame lo que quieras: normas, viscosidades, marcas, filtros, grasas, frenos, baterías, objeciones de mostrador.</div>
@@ -4544,7 +4576,7 @@
       });
       if (score > bestScore){ bestScore = score; best = e; }
     });
-    if (best && bestScore >= 2.0) return { text: best.a, go: best.go, sub: best.sub };
+    if (best && bestScore >= 2.0) return { text: best.a, go: best.go, sub: best.sub, lv: "qa" };
 
     // fallback: buscar el párrafo del manual que mejor responde
     var esc = function(w){ return w.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&"); };
@@ -4566,7 +4598,7 @@
           out += "\n\n" + c.raw;
         }
       }
-      return { text: out + "\n\n\u2014 de \u201C" + t0.title + "\u201D", go: t0.go, sub: t0.sub };
+      return { text: out + "\n\n\u2014 de \u201C" + t0.title + "\u201D", go: t0.go, sub: t0.sub, lv: "parrafo" };
     }
 
     var scored = index.map(function(it){
@@ -4579,9 +4611,9 @@
       var top = scored[0].it;
       var term = words.find(function(w){ return top.text.indexOf(w) > -1; }) || words[0] || "";
       return { text: "Lo m\u00e1s cercano que tengo es esto, en \u201C" +
-               top.title + "\u201D:\n\n" + snippet(top, term), go: top.go, sub: top.sub };
+               top.title + "\u201D:\n\n" + snippet(top, term), go: top.go, sub: top.sub, lv: "cercano" };
     }
-    return { text: "No tengo esa respuesta cargada. Prueba con otras palabras \u2014 por ejemplo el nombre de la norma (API, SAE, JASO, NLGI, DOT), la viscosidad, la marca o la l\u00ednea. Tambi\u00e9n puedes buscar el tema en el men\u00fa de la izquierda.", go: null, sub: null };
+    return { text: "No tengo esa respuesta cargada. Prueba con otras palabras \u2014 por ejemplo el nombre de la norma (API, SAE, JASO, NLGI, DOT), la viscosidad, la marca o la l\u00ednea. Tambi\u00e9n puedes buscar el tema en el men\u00fa de la izquierda.", go: null, sub: null, lv: "nada" };
   }
 
   /* ============ CHAT ============ */
@@ -4623,6 +4655,9 @@
   var busy = false, ctl = null;
 
   /* ============ IA CON BÚSQUEDA WEB (clave guardada solo en este navegador) ============ */
+  /* dentro de claude.ai (artefacto) la IA es la del plan del usuario y la red externa está bloqueada */
+  var IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
+  var CLAUDE_URL = "https://claude.ai/artifact/UPSgz7aZmEmrpQ7ddww993";
   var API_URL = "https://api.anthropic.com/v1/";
   var API_MODEL = "claude-sonnet-5";
   var KEY_STORE = "austrofil.claudeKey";
@@ -4631,7 +4666,7 @@
     try { if (k) localStorage.setItem(KEY_STORE, k); else localStorage.removeItem(KEY_STORE); return true; }
     catch (e){ return false; }
   }
-  var apiKey = loadKey();
+  var apiKey = IN_CLAUDE ? "" : loadKey();
 
   function setMode(){
     cmode.classList.remove("ia", "web");
@@ -4860,7 +4895,7 @@
     var on = typeof open === "boolean" ? open : cset.hidden;
     cset.hidden = !on;
     ckey.setAttribute("aria-expanded", on ? "true" : "false");
-    if (on){ syncSet(); setTimeout(function(){ ckeyin.focus(); }, 60); }
+    if (on) syncSet();
   }
   async function saveKey(){
     var k = (ckeyin.value || "").replace(/\s+/g, "");
@@ -4882,6 +4917,7 @@
             "Clave guardada. No pude verificarla ahora; se probará con la primera pregunta.") +
            (kept ? "" : " Ojo: este navegador no permite guardarla y se perderá al cerrar la página."), "ok");
   }
+  if (IN_CLAUDE) ckey.hidden = true;
   ckey.addEventListener("click", function(){ toggleSet(); });
   cmode.addEventListener("click", function(){ toggleSet(true); });
   ckeysave.addEventListener("click", saveKey);
@@ -4965,10 +5001,287 @@
       : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>';
   }
 
+  /* ============ ENTENDER LA PREGUNTA ============ */
+  /* abreviaturas de chat: "q es grasa" = "que es grasa" */
+  var ABREV = { q: "que", k: "que", ke: "que", xq: "porque", pq: "porque", porq: "porque", xk: "porque",
+    pa: "para", tb: "tambien", tmb: "tambien", d: "de", x: "por", cm: "como", cmo: "como", dnd: "donde",
+    cdo: "cuando", xfa: "", porfa: "", pls: "" };
+  function prepQ(t){
+    return norm(t).replace(/(\d)\.(\d)/g, "$1\u0001$2").replace(/[^a-z0-9\s\u0001-]/g, " ").replace(/\u0001/g, ".")
+      .split(/\s+/).filter(Boolean)
+      .map(function(w){ return Object.prototype.hasOwnProperty.call(ABREV, w) ? ABREV[w] : w; })
+      .filter(Boolean).join(" ");
+  }
+  function escRe(w){ return w.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&"); }
+  function singAll(t){ return t.split(" ").map(sing).join(" "); }
+  function clip(t){ return (t || "").replace(/\s+/g, " ").trim(); }
+
+  /* ¿la pregunta pide una definición? devuelve el término ("aceite", "grasa") */
+  var ART = "(?:(?:el|la|los|las|un|una|lo)\\s+)?";
+  var DEF_RES = [
+    new RegExp("^(?:para que|pa que)\\s+(?:sirve|sirven|se usa|se usan|es|son)\\s+" + ART + "(.+)$"),
+    new RegExp("^(?:define|definir|definicion de|explica|explicame|explicame que es)\\s+" + ART + "(.+)$"),
+    new RegExp("^(?:que|cual|cuales)\\s+(?:(?:es|son|significa|significan|quiere decir|seria)\\s+)?" + ART + "(.+)$")
+  ];
+  function defTerm(qn){
+    var m = null;
+    DEF_RES.some(function(re){ m = qn.match(re); return !!m; });
+    var t = m ? m[1] : (qn.split(" ").length <= 2 ? qn : "");
+    return singAll((t || "").replace(/\s+(?:de|del|en|para)\s+(?:el|la|un|una)?\s*(?:auto|carro|vehiculo|motor)$/, "").trim());
+  }
+
+  /* de dónde sale, dentro del manual, la respuesta a "¿qué es X?" */
+  var DEFS = [
+    { a: "aceite|aceite de motor|aceite lubricante|lubricante|lubricar|lubricacion", sub: "lu1" },
+    { a: "grasa|grasa lubricante", sub: "gr2" },
+    { a: "starke|marca propia", qa: "starke marca propia" },
+    { a: "austrofil|empresa|la empresa", qa: "empresa austrofil" },
+    { a: "filtro", intro: "filtros", qa: "filtro filtros tipos" },
+    { a: "refrigerante|anticongelante|coolant|liquido refrigerante", find: "Tres cosas: sube el punto",
+      lead: "Qué hace el refrigerante: ", go: "refrigerantes" },
+    { a: "liquido de freno|liquido para freno", qa: "dot 3 4 5.1 liquido de freno" },
+    { a: "freno", intro: "frenos", qa: "dot 3 4 5.1 liquido de freno" },
+    { a: "bateria|acumulador", intro: "baterias", qa: "bateria baterias ah cca" },
+    { a: "bujia", intro: "bujias", qa: "bujia bujias cobre platino" },
+    { a: "aditivo", intro: "aditivos", qa: "aditivos detergente dispersante" }
+  ];
+  DEFS.forEach(function(d){ d.al = d.a.split("|").map(function(x){ return singAll(norm(x)); }); });
+
+  var GLOSS = {};
+  [].slice.call(document.querySelectorAll("#v-glosario dl.gloss > div")).forEach(function(div){
+    var dt = div.querySelector("dt"), dd = div.querySelector("dd");
+    if (!dt || !dd) return;
+    dt.textContent.split("/").forEach(function(term){
+      var k = singAll(norm(term.trim()));
+      if (k && !GLOSS[k]) GLOSS[k] = { title: clip(dt.textContent), text: clip(dd.textContent) };
+    });
+  });
+
+  function qaByKey(prefix){
+    for (var i = 0; i < QA.length; i++) if (QA[i].k.indexOf(prefix) === 0) return QA[i];
+    return null;
+  }
+
+  /* texto de una subsección: párrafos, listas y filas de tabla, en orden */
+  function sectionText(sec, max){
+    var out = [], len = 0;
+    [].slice.call(sec.querySelectorAll("p, li, tr")).some(function(el){
+      if (el.closest(".call") || el.closest(".foot")) return false;
+      var t, row = el.tagName === "TR";
+      if (row){
+        var tds = el.querySelectorAll("td");
+        if (tds.length < 2) return false;
+        t = "- " + clip(tds[0].textContent) + ": " + clip(tds[1].textContent);
+      } else t = clip(el.textContent);
+      if (t.length < 25) return false;
+      out.push({ t: t, row: row });
+      len += t.length;
+      return len > max;
+    });
+    return out.map(function(o, i){
+      return (i === 0 ? "" : (o.row && out[i - 1].row ? "\n" : "\n\n")) + o.t;
+    }).join("");
+  }
+
+  function buildDef(d){
+    var parts = [], title = "", go = d.go || null, sub = null;
+    if (d.sub){
+      var sec = document.getElementById("s-" + d.sub);
+      if (sec){
+        var h = sec.querySelector("h2"), v = sec.closest(".view");
+        title = h ? clip(h.textContent) : "";
+        parts.push(sectionText(sec, 850));
+        go = v ? v.id.slice(2) : go; sub = d.sub;
+      }
+    }
+    if (d.intro){
+      var vw = document.getElementById("v-" + d.intro), p = vw && vw.querySelector(".vhead p");
+      if (p){ parts.push(clip(p.textContent)); go = go || d.intro; title = title || vw.dataset.menu; }
+    }
+    if (d.find){
+      var hit = null;
+      pindex.some(function(it){ if (it.raw.indexOf(d.find) === 0){ hit = it; return true; } return false; });
+      if (hit){ parts.push((d.lead || "") + hit.raw); go = go || hit.go; sub = sub || hit.sub; title = title || hit.title; }
+    }
+    if (d.qa){
+      var e = qaByKey(d.qa);
+      if (e){ parts.push(e.a); go = go || e.go; sub = sub || e.sub; }
+    }
+    var text = parts.filter(Boolean).join("\n\n");
+    if (!text) return null;
+    return { text: text + (title ? "\n\n\u2014 de \u201C" + title + "\u201D" : ""), go: go, sub: sub, lv: "def" };
+  }
+
+  function defAnswer(text){
+    var key = defTerm(prepQ(text));
+    if (!key) return null;
+    for (var i = 0; i < DEFS.length; i++) if (DEFS[i].al.indexOf(key) > -1) return buildDef(DEFS[i]);
+    /* una respuesta del banco que define el término: "SAE es ...", "El cárter es ..." */
+    var re = new RegExp("^(el |la |los |las |un |una )?" + escRe(key) + "s? (es|son) ");
+    for (var j = 0; j < QA.length; j++){
+      if (re.test(norm(QA[j].a))) return { text: QA[j].a, go: QA[j].go, sub: QA[j].sub, lv: "def" };
+    }
+    if (GLOSS[key]) return { text: GLOSS[key].text + "\n\n\u2014 del Glosario (" + GLOSS[key].title + ")", go: "glosario", sub: null, lv: "def" };
+    return null;
+  }
+
+  /* ranking del banco de respuestas y de los párrafos (misma lógica que answerLocal) */
+  function qForm(qn){
+    return qn.split(/([^a-z0-9]+)/).map(function(t){ return /^[a-z0-9]+$/.test(t) ? sing(t) : t; }).join("");
+  }
+  function qWords(qs){
+    return qs.split(/[^a-z0-9]+/).filter(function(w){ return w.length > 1 && STOP.indexOf(w) < 0; });
+  }
+  function rankQA(qs){
+    return QA.map(function(e){
+      if (e.rq && !e.rq.some(function(r){ return qs.indexOf(r) > -1; })) return null;
+      var sc = 0;
+      e.kw.forEach(function(k){
+        var w = 3 / Math.sqrt(DF[k] || 1);
+        if (new RegExp("(^|[^a-z0-9])" + escRe(k) + "([^a-z0-9]|$)").test(qs)) sc += w;
+        else if (qs.indexOf(k) > -1) sc += w / 3;
+      });
+      return sc > 0 ? { e: e, s: sc } : null;
+    }).filter(Boolean).sort(function(a, b){ return b.s - a.s; });
+  }
+  function rankParas(words){
+    return pindex.map(function(it){
+      var sc = 0;
+      words.forEach(function(w){
+        if (new RegExp("(^|[^a-z0-9])" + escRe(w)).test(it.text)) sc += 3;
+        else if (it.text.indexOf(w) > -1) sc += 1;
+      });
+      return { it: it, s: sc / (1 + Math.log(1 + it.text.length / 160)) };
+    }).filter(function(x){ return x.s > 0; }).sort(function(a, b){ return b.s - a.s; });
+  }
+
+  /* lo que la IA recibe del manual con cada pregunta */
+  function manualExcerpts(text){
+    var qs = qForm(prepQ(text)), words = qWords(qs);
+    var out = [], seen = {}, total = 0, top = null;
+    function add(label, body, go, sub, strong){
+      body = (body || "").trim();
+      if (!body) return;
+      var key = body.slice(0, 60);
+      if (seen[key]) return;
+      if (body.length > 900) body = body.slice(0, 900) + "\u2026";
+      if (total + body.length > 6500) return;
+      seen[key] = 1;
+      out.push("[" + label + "]\n" + body);
+      total += body.length;
+      if (!top && strong && go) top = { go: go, sub: sub };
+    }
+    var d = defAnswer(text);
+    if (d) add("Definición del manual", d.text, d.go, d.sub, true);
+    rankQA(qs).slice(0, 3).forEach(function(x){
+      if (x.s >= 1) add("Respuesta del manual", x.e.a, x.e.go, x.e.sub, x.s >= 2);
+    });
+    rankParas(words).slice(0, 5).forEach(function(x){
+      if (x.s >= 1.4) add(x.it.theme + " \u203A " + x.it.title, x.it.raw, x.it.go, x.it.sub, x.s >= 3);
+    });
+    return { text: out.join("\n\n"), top: top };
+  }
+
+  var IA_REGLAS = [
+    "CÓMO RESPONDER EN ESTE CHAT:",
+    "- Con cada pregunta te paso EXTRACTOS DEL MANUAL. Si responden la pregunta, básate en ellos: son la versión oficial de Austrofil.",
+    "- Si el manual no lo cubre, responde con tu conocimiento técnico general y aclara en una frase que ese dato no viene del manual.",
+    "- Nunca inventes datos internos de Austrofil (precios, stock, códigos, márgenes, clientes). Si no están en los extractos, dilo.",
+    "- No tienes internet: si algo depende de datos actuales (precios de mercado, lanzamientos, noticias), dilo y sugiere buscarlo.",
+    "- Las preguntas pueden venir abreviadas o con faltas (\"q es\" = qué es): interprétalas con sentido común.",
+    "- Texto plano, sin markdown: nada de asteriscos, # ni tablas. Para listas usa guiones."
+  ].join("\n");
+  function iaInstr(){
+    var hoy = new Date().toLocaleDateString("es-EC", { day: "numeric", month: "long", year: "numeric" });
+    return CONTEXTO + "\n\n" + IA_REGLAS + "\nFECHA: hoy es " + hoy + ".";
+  }
+
+  /* botones bajo una respuesta: Más a fondo · Preguntar a la IA · Buscar en Google */
+  function addActs(el, question, opt){
+    var row = document.createElement("div");
+    row.className = "acts";
+    if (opt.deep && sampleFn){
+      var b = document.createElement("button");
+      b.className = "chip ia";
+      b.textContent = "Más a fondo";
+      b.addEventListener("click", function(){
+        if (busy) return;
+        b.disabled = true;
+        bubble("me", "Más a fondo");
+        askSampleTurn(null, question);
+      });
+      row.appendChild(b);
+    }
+    if (opt.claude){
+      var c = document.createElement("a");
+      c.className = "chip ia";
+      c.href = CLAUDE_URL; c.target = "_blank"; c.rel = "noopener";
+      c.textContent = "Preguntar a la IA \u2197";
+      c.title = "Abre el manual en Claude: IA gratis con tu cuenta";
+      row.appendChild(c);
+    }
+    var g = document.createElement("a");
+    g.className = "chip";
+    g.href = "https://www.google.com/search?q=" + encodeURIComponent(question);
+    g.target = "_blank"; g.rel = "noopener noreferrer";
+    g.textContent = "Buscar en Google \u2197";
+    row.appendChild(g);
+    el.appendChild(row);
+    chatlog.scrollTop = chatlog.scrollHeight;
+  }
+
   function localReply(text){
-    var r = answerLocal(text);
+    var r = defAnswer(text) || answerLocal(prepQ(text));
     var b = bubble("bot", r.text);
     addLink(b, r.go, r.sub);
+    if (r.lv !== "def" && r.lv !== "qa") addActs(b, text, { claude: !IN_CLAUDE });
+  }
+
+  /* IA del plan de Claude (artefacto), con los extractos del manual */
+  async function askSampleTurn(text, deepOf){
+    var base = deepOf || text;
+    var ctx = manualExcerpts(base);
+    var q = deepOf ? "Amplía con más detalle y ejemplos prácticos de venta tu respuesta sobre: \u00AB" + deepOf + "\u00BB" : text;
+    turns.push({ role: "user", content: q });
+    while (turns.length > 10 || (turns.length && turns[0].role !== "user")) turns.shift();
+    var aug = q + (ctx.text ? "\n\nEXTRACTOS DEL MANUAL:\n" + ctx.text
+                            : "\n\n(El manual no trae extractos relacionados con esta pregunta.)");
+    var input = [{ role: "user", content: iaInstr() }].concat(
+      turns.slice(0, -1).map(function(t){ return { role: t.role, content: String(t.content).slice(0, 3000) }; }),
+      [{ role: "user", content: aug }]);
+    var out = bubble("bot", deepOf ? "Pensando a fondo\u2026" : "Pensando\u2026");
+    out.classList.add("dots");
+    setBusy(true);
+    ctl = new AbortController();
+    try {
+      var res = await sampleFn(input, {
+        cache: false, modelTier: deepOf ? "default" : "quick", signal: ctl.signal,
+        onText: function(u){
+          out.classList.remove("dots");
+          out.textContent = u.text;
+          chatlog.scrollTop = chatlog.scrollHeight;
+        }
+      });
+      out.classList.remove("dots");
+      out.textContent = res.text + (res.truncated ? "\u2026" : "");
+      turns.push({ role: "assistant", content: res.text });
+      if (ctx.top) addLink(out, ctx.top.go, ctx.top.sub);
+      addActs(out, base, { deep: !deepOf });
+    } catch (e){
+      out.remove();
+      turns.pop();
+      if (!e || e.code !== "cancelled"){
+        bubble("sys", (e && COPY[e.code]) || COPY.upstream_error);
+        if (e && (e.code === "not_granted" || e.code === "sampling_disabled" ||
+                  e.code === "not_declared" || e.code === "capability_disabled")){
+          sampleFn = null; setMode();
+        }
+        localReply(base);
+      }
+    } finally {
+      setBusy(false); ctl = null;
+      chatlog.scrollTop = chatlog.scrollHeight;
+    }
   }
 
   async function ask(text){
@@ -4981,41 +5294,7 @@
     if (!cset.hidden) toggleSet(false);
     if (apiKey){ await askWebTurn(text); return; }
     if (!sampleFn){ localReply(text); return; }
-
-    turns.push({ role: "user", content: text });
-    while (turns.length > 10) turns.shift();
-    var out = bubble("bot", "Pensando…");
-    out.classList.add("dots");
-    setBusy(true);
-    ctl = new AbortController();
-    try {
-      var res = await sampleFn(
-        [{ role: "user", content: CONTEXTO }].concat(turns),
-        { cache: false, modelTier: "quick", signal: ctl.signal,
-          onText: function(u){
-            out.classList.remove("dots");
-            out.textContent = u.text;
-            chatlog.scrollTop = chatlog.scrollHeight;
-          } }
-      );
-      out.classList.remove("dots");
-      out.textContent = res.text;
-      turns.push({ role: "assistant", content: res.text });
-    } catch (e){
-      out.remove();
-      turns.pop();
-      if (!e || e.code !== "cancelled"){
-        bubble("sys", (e && COPY[e.code]) || COPY.upstream_error);
-        if (e && (e.code === "not_granted" || e.code === "sampling_disabled" ||
-                  e.code === "not_declared" || e.code === "capability_disabled")){
-          sampleFn = null; setMode();
-        }
-        localReply(text);
-      }
-    } finally {
-      setBusy(false); ctl = null;
-      chatlog.scrollTop = chatlog.scrollHeight;
-    }
+    await askSampleTurn(text, null);
   }
 
   send.addEventListener("click", function(){
