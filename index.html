@@ -437,6 +437,21 @@
     padding:8px 16px;border-radius:999px;text-decoration:none}
   :root[data-theme="dark"] .cset a.cset-open{color:#14110C}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cset a.cset-open{color:#14110C}}
+  /* v20: IA gratis con Gemini */
+  .cset{max-height:min(68vh, 480px);overflow-y:auto;flex:0 0 auto}
+  .cset > *{flex-shrink:0}
+  .cset .cset-main{border-color:var(--amber)}
+  .cset ol.cset-steps{margin:0;padding-left:19px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+  .cset ol.cset-steps li{margin:3px 0}
+  .cset ol.cset-steps b{font-family:inherit;font-size:inherit;font-variation-settings:normal;font-weight:600;color:var(--ink)}
+  .cset p.cset-note{font-size:11.5px;color:var(--ink-3)}
+  .cset details.cset-pay{display:block}
+  .cset details.cset-pay > summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+  .cset details.cset-pay > p{margin-top:8px}
+  .msg.chint{align-self:stretch;max-width:100%;background:var(--amber-wash);color:var(--ink-2);font-size:13px;padding:9px 12px}
+  .msg.chint button{font:inherit;font-weight:600;color:var(--amber-ink);text-decoration:underline;
+    text-underline-offset:2px;padding:0;background:none}
+  .msg.chint[hidden]{display:none}
 
 
   /* viscosity grid */
@@ -591,7 +606,7 @@
     <button class="dclose" id="dclose" aria-label="Cerrar menú">&times;</button>
   </div>
   <nav class="dnav" id="dnav"></nav>
-  <div class="dver">Versión <b>19</b> · 18-09-2026</div>
+  <div class="dver">Versión <b>20</b> · 19-09-2026</div>
 </aside>
 
 <main id="main">
@@ -3936,22 +3951,33 @@
   </div>
   <div class="cset" id="cset" hidden>
     <b>Respuestas con IA</b>
-    <div class="cset-opt">
-      <p><b>Gratis con tu cuenta de Claude.</b> Abre el manual en Claude: el chat responde con IA usando tu plan, sin costo extra.</p>
-      <a class="cset-open" id="copenclaude" href="https://claude.ai/artifact/NnymPUgvKqDG9D4mgEgWH6" target="_blank" rel="noopener">Abrir el manual en Claude ↗</a>
-    </div>
-    <div class="cset-opt">
-      <p><b>Con búsqueda en internet (de pago).</b> Necesita una clave de API de <a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener">platform.claude.com</a>, que se paga aparte. Se guarda solo en este navegador.</p>
-      <input id="ckeyin" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…" aria-label="Clave de API de Claude">
+    <div class="cset-opt cset-main">
+      <p><b>Gratis con Google Gemini.</b> Se configura una sola vez:</p>
+      <ol class="cset-steps">
+        <li>Abre <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> y entra con tu cuenta de Google (Gmail).</li>
+        <li>Toca <b>Create API key</b> (Crear clave de API) y copia la clave.</li>
+        <li>Pégala aquí abajo y toca <b>Guardar</b>.</li>
+      </ol>
+      <input id="ckeyin" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Pega aquí tu clave (AIza…)" aria-label="Clave de API">
       <div class="cset-btns">
         <button class="cset-save" id="ckeysave">Guardar</button>
         <button class="cset-del" id="ckeydel" hidden>Quitar clave</button>
       </div>
       <p class="cset-st" id="ckeyst" role="status"></p>
+      <p class="cset-note">Sin tarjeta y sin costo, con un cupo diario de preguntas. Responde con el manual y lo que sabe la IA, pero no busca en internet. En el plan gratis Google puede usar las preguntas para mejorar sus productos: no escribas datos de clientes. La clave queda guardada solo en este navegador.</p>
     </div>
+    <div class="cset-opt">
+      <p><b>Gratis con tu cuenta de Claude.</b> Abre el manual en Claude: el chat responde con IA usando tu plan, sin costo extra.</p>
+      <a class="cset-open" id="copenclaude" href="https://claude.ai/artifact/NnymPUgvKqDG9D4mgEgWH6" target="_blank" rel="noopener">Abrir el manual en Claude ↗</a>
+    </div>
+    <details class="cset-opt cset-pay">
+      <summary>Con búsqueda en internet (de pago)</summary>
+      <p>Pega en el mismo campo una clave de API de Claude (empieza con sk-ant-) de <a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener">platform.claude.com</a>. Se paga aparte, por uso.</p>
+    </details>
   </div>
   <div class="chatlog" id="chatlog">
     <div class="msg bot">Pregúntame lo que quieras: normas, viscosidades, marcas, filtros, grasas, frenos, baterías, objeciones de mostrador.</div>
+    <div class="msg chint" id="chint" hidden>Ahora respondo solo con el texto del manual. Para que te responda una IA, gratis: <button type="button" id="chintgo">activar IA</button></div>
     <div class="sugg" id="sugg">
       <button>¿Qué significa SAE?</button>
       <button>¿Cada cuánto se cambia el aceite?</button>
@@ -4274,7 +4300,7 @@
      a:"Para taxi, auto con años o uso duro, el mercado ecuatoriano pide 20W-50. En el portafolio lo cubren Castrol GTX, Havoline, Amalie Imperial y Kendall GT-1. Para auto nuevo, turbo o híbrido es al revés: 0W-20 o 5W-30 sintético, y ahí van Castrol Magnatec, Kendall GT-1 Max o Amalie Full Synthetic.", go:"motos", sub:"mo2"},
     {k:"agua radiador refrigerante solo agua",
      a:"El agua sola oxida el bloque, deja sarro que tapa el radiador, no lubrica el sello de la bomba y hierve antes. El refrigerante hace tres cosas: sube el punto de ebullición, baja el de congelación y protege contra corrosión — y en Ecuador la que vale es la anticorrosión, porque aquí no congela pero sí oxida. Esa venta se gana hablando de corrosión, no de temperatura: la corrosión el cliente la puede ver en su radiador.", go:"refrigerantes"},
-    {k:"iat oat hoat refrigerante color tecnologia",
+    {k:"iat oat hoat refrigerante color tecnologia uso pongo tipo",
      a:"IAT es la tecnología inorgánica antigua, dura unos 2 años y se vuelve ácida. OAT es orgánica, de intervalo extendido. HOAT es híbrida: orgánica con aditivos inorgánicos, con más protección anticorrosiva. Dato clave: el color NO está estandarizado en la industria. Dos refrigerantes del mismo color pueden ser tecnologías incompatibles. Se elige por la especificación del vehículo, nunca por el color del galón, y no se mezclan tecnologías.", go:"refrigerantes"},
     {k:"dot 3 4 5.1 liquido de freno hervir higroscopico",
      a:"El líquido de freno es higroscópico: absorbe humedad del aire con el tiempo, y el agua le baja el punto de ebullición. En una bajada larga con frenada sostenida el líquido hierve, se forma vapor, y el vapor sí se comprime: el pedal se va al piso. DOT 3 seco 205 °C y húmedo 140 °C; DOT 4, 230 y 155; DOT 5.1, 260 y 180. Esos tres son de glicol y se mezclan entre sí. DOT 5 es de silicona y NO se mezcla con ninguno.", go:"frenos"},
@@ -4341,7 +4367,7 @@
      a:"Muchos vehículos usan ATF en la dirección hidráulica, pero otros piden un fluido específico (los europeos suelen pedir uno mineral verde o un sintético propio). No es intercambiable a ojo: se revisa el manual o la tapa del depósito.", go:"automotriz", sub:"au4"},
     {k:"grasa litio calcio complejo espesante tipo",
      a:"El espesante define la grasa. Litio: la multipropósito clásica, buen rango general. Calcio: muy resistente al agua, pero de menor temperatura. Complejo de litio: misma consistencia que el litio pero con punto de goteo mucho más alto, para alta temperatura. Poliurea: sellada de por vida, motores eléctricos. No se mezclan espesantes distintos.", go:"grasas", sub:null},
-    {k:"que aceite pongo moto mi moto 150 200 recomiendo cual",
+    {k:"que aceite pongo uso usar lleva echo moto mi moto 150 200 recomiendo cual", req:"moto scooter",
      a:"Primero la pregunta clave: ¿es de cambios o scooter automático? De cambios (4T) va JASO MA2 en la viscosidad del manual — en Ecuador casi siempre 20W-50; si es de mayor cilindrada o exige, 10W-40. Scooter automático va JASO MB. Y para 2T, JASO FD o API TC. En el portafolio: Motul si quieres gama completa, o Top 1, Castrol, Havoline, Golden Bear y AROIL en 20W-50.", go:"motos", sub:"mo6"},
     {k:"aceite moto distinto carro auto diferencia por que no mismo",
      a:"Porque la moto exige más con menos: menos aceite en el cárter, muchas más revoluciones, más temperatura, enfriamiento por aire, y el mismo aceite lubrica motor, caja Y embrague. Además el aceite de auto lleva modificadores de fricción para ahorrar combustible, y en una moto de embrague húmedo eso hace patinar el embrague. Por eso existe la norma JASO.", go:"motos", sub:"mo6"},
@@ -4433,7 +4459,7 @@
      a:"Starke es jabón de calcio: lo más resistente al agua, va donde hay humedad — lavadoras, agro, obra, minería. ABRO es litio: aguanta más temperatura y, con aditivos EP, más carga de impacto — va en cojinetes de rueda, suspensión y maquinaria caliente. No compiten, cubren clientes distintos. Y por eso mismo no se mezclan entre sí.", go:"grasas", sub:"gr5"},
     {k:"starke 50/50 5050 prediluido azul naranja oat noat atom protection especificaciones ficha",
      a:"Los dos prediluidos Starke llevan tecnología ATOM-PROTECTION con base OAT y NOAT. El naranja es para gasolina: 50 % glicoles, pH 7,5-10, ebullición ~130 °C, congelación ~ -25 °C, protección 250.000 km o 5 años. El azul es para diésel: 55 % glicoles, pH 8-9,5, ebullición ~135 °C, congelación ~ -41 °C, protección 250.000 km o 6 años, y sirve en industrial y marítimo. Ambos libres de fosfatos y silicatos. Ojo: NO se les echa agua encima.", go:"refrigerantes", sub:null},
-    {k:"fosfatos silicatos libre por que importa refrigerante barato",
+    {k:"fosfatos silicatos libre por que importa refrigerante barato", req:"refrigerante anticongelante fosfato silicato coolant",
      a:"Los fosfatos y silicatos son los aditivos de la tecnología vieja: protegen rápido pero se agotan, precipitan y dejan depósitos en el sistema. Un refrigerante libre de ellos, con base OAT/NOAT, protege durante años en vez de meses. Ese es el argumento técnico frente a un refrigerante barato.", go:"refrigerantes", sub:null},
     {k:"starke verde rojo concentrado diferencia glicoles radiador metal",
      a:"El Starke verde concentrado va en vehículos con radiador de metal, donde el agua común oxida, o de mediano uso. El rojo tiene las mismas especificaciones pero con mayor contenido de glicoles, o sea más rango de protección contra el recalentamiento. Los dos son concentrados: se diluyen con agua desmineralizada, y ahí entra el agua destilada Starke.", go:"refrigerantes", sub:null},
@@ -4517,7 +4543,7 @@
      a:"Sellado, en lugar fresco y sin sol, un aceite de motor se conserva bien alrededor de 5 años; una vez abierto, conviene usarlo dentro del año. Lo que se degrada primero es el paquete de aditivos, que puede separarse. Los tambores nunca se guardan a la intemperie parados con la tapa hacia arriba: acumulan agua y la chupan al enfriarse.", go:"lubricantes", sub:"lu2"},
     {k:"leer envase etiqueta interpretar galon",
      a:"En un envase de motor busca tres cosas: la viscosidad SAE (20W-50, por ejemplo), la norma de desempeño API (SP, SN, CK-4) y el tipo de base (mineral, semisintético, sintético). En moto agrega la JASO (MA2 o MB). Con esas tres o cuatro líneas ya sabes si el producto calza con el vehículo.", go:"lubricantes", sub:"lu3"},
-    {k:"objecion mas barato competencia precio caro",
+    {k:"objecion mas barato competencia precio caro cliente dice otro economico",
      a:"No compares galones, compara kilómetros. Un sintético de 10.000 km cuesta menos por kilómetro que un mineral de 4.000, aunque el galón valga más. Y agrega el costo de oportunidad: cada cambio es una visita al taller, tiempo del vehículo parado. Si aún así el cliente quiere precio, ahí está la marca de volumen del portafolio — no pierdas la venta, bájala de escalón.", go:"vender", sub:null},
     {k:"objecion siempre pongo 20w50 costumbre taller",
      a:"Es la objeción más común del parque ecuatoriano. La respuesta es: el 20W-50 es correcto para la mayoría del parque viejo, pero en un motor moderno que pide 5W-30 el 20W-50 no alcanza a llegar a tiempo a las galerías en el arranque. No es darle más protección, es dársela más tarde. Lo que manda es el manual, no la costumbre.", go:"vender", sub:null},
@@ -4558,36 +4584,13 @@
   QA.forEach(function(e){ e.kw.forEach(function(k){ DF[k] = (DF[k] || 0) + 1; }); });
 
   function answerLocal(question){
-    var qn = norm(question).split(/([^a-z0-9]+)/).map(function(t){
-      return /^[a-z0-9]+$/.test(t) ? sing(t) : t;
-    }).join("");
-    var words = qn.split(/[^a-z0-9]+/).filter(function(w){
-      return w.length > 1 && STOP.indexOf(w) < 0;
-    });
-    var best = null, bestScore = 0;
-    QA.forEach(function(e){
-      if (e.rq && !e.rq.some(function(r){ return qn.indexOf(r) > -1; })) return;
-      var score = 0;
-      e.kw.forEach(function(k){
-        var wgt = 3 / Math.sqrt(DF[k] || 1);
-        var whole = new RegExp("(^|[^a-z0-9])" + k.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&") + "([^a-z0-9]|$)");
-        if (whole.test(qn)) score += wgt;
-        else if (qn.indexOf(k) > -1) score += wgt / 3;
-      });
-      if (score > bestScore){ bestScore = score; best = e; }
-    });
-    if (best && bestScore >= 2.0) return { text: best.a, go: best.go, sub: best.sub, lv: "qa" };
+    var qn = qForm(norm(question));
+    var words = qWords(qn);
+    var rq = rankQA(qn);
+    if (rq.length && rq[0].s >= 2.0) return { text: rq[0].e.a, go: rq[0].e.go, sub: rq[0].e.sub, lv: "qa", s: rq[0].s };
 
     // fallback: buscar el párrafo del manual que mejor responde
-    var esc = function(w){ return w.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&"); };
-    var scoredP = pindex.map(function(it){
-      var sc = 0;
-      words.forEach(function(w){
-        if (new RegExp("(^|[^a-z0-9])" + esc(w)).test(it.text)) sc += 3;
-        else if (it.text.indexOf(w) > -1) sc += 1;
-      });
-      return { it: it, s: sc / (1 + Math.log(1 + it.text.length / 160)) };
-    }).filter(function(x){ return x.s > 0; }).sort(function(a,b){ return b.s - a.s; });
+    var scoredP = rankParas(words, qn);
 
     if (scoredP.length && scoredP[0].s >= 1.4){
       var t0 = scoredP[0].it, out = t0.raw;
@@ -4661,18 +4664,24 @@
   var API_URL = "https://api.anthropic.com/v1/";
   var API_MODEL = "claude-sonnet-5";
   var KEY_STORE = "austrofil.claudeKey";
-  function loadKey(){ try { return localStorage.getItem(KEY_STORE) || ""; } catch (e){ return ""; } }
-  function storeKey(k){
-    try { if (k) localStorage.setItem(KEY_STORE, k); else localStorage.removeItem(KEY_STORE); return true; }
+  var GEM_STORE = "austrofil.geminiKey", GEM_MODELS = "austrofil.geminiModelos";
+  function lsGet(k){ try { return localStorage.getItem(k) || ""; } catch (e){ return ""; } }
+  function lsSet(k, v){
+    try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); return true; }
     catch (e){ return false; }
   }
+  function loadKey(){ return lsGet(KEY_STORE); }
+  function storeKey(k){ return lsSet(KEY_STORE, k); }
   var apiKey = IN_CLAUDE ? "" : loadKey();
+  var gemKey = IN_CLAUDE ? "" : lsGet(GEM_STORE);
 
   function setMode(){
     cmode.classList.remove("ia", "web");
     if (apiKey){ cmode.textContent = "IA + web"; cmode.classList.add("web"); }
-    else if (sampleFn){ cmode.textContent = "IA"; cmode.classList.add("ia"); }
+    else if (gemKey || sampleFn){ cmode.textContent = "IA"; cmode.classList.add("ia"); }
     else cmode.textContent = "Manual";
+    var hint = document.getElementById("chint");
+    if (hint) hint.hidden = IN_CLAUDE || !!(apiKey || gemKey || sampleFn);
   }
 
   function apiHeaders(k){
@@ -4707,7 +4716,7 @@
     var m = String((e && e.message) || "").toLowerCase();
     if (e.type === "empty") return COPY.empty_completion;
     if (e.status === 401 || e.type === "authentication_error")
-      return "La clave de API no es válida. Revísala con el botón de la llave, arriba a la derecha.";
+      return "La clave de API no es válida. Revísala con el botón de IA, arriba a la derecha.";
     if (/credit balance|billing/.test(m))
       return "Se agotó tu saldo en la Consola de Claude. Recarga crédito para seguir usando la IA.";
     if (/web.?search/.test(m) && /enabl|disabl|not allowed|permission|organi[sz]ation/.test(m))
@@ -4877,6 +4886,211 @@
     }
   }
 
+  /* ============ IA GRATIS CON GOOGLE GEMINI (clave propia de AI Studio, guardada solo en este navegador) ============ */
+  var GEM_URL = "https://generativelanguage.googleapis.com/v1beta/";
+  /* solo si no se pudo leer la lista de modelos de la cuenta al guardar la clave */
+  var GEM_DEFAULT = ["gemini-3.5-flash", "gemini-2.5-flash", "gemini-flash-latest", "gemini-3.5-flash-lite", "gemini-2.5-flash-lite"];
+  var gemCool = {}, gemNoThink = {};
+
+  function gemModels(){
+    try {
+      var m = JSON.parse(lsGet(GEM_MODELS) || "null");
+      if (Array.isArray(m) && m.length) return m;
+    } catch (_){}
+    return GEM_DEFAULT.slice();
+  }
+  function dropGemModel(m){
+    var list = gemModels().filter(function(x){ return x !== m; });
+    lsSet(GEM_MODELS, list.length ? JSON.stringify(list) : "");
+  }
+  /* de los modelos de la cuenta: los Flash estables, del más nuevo al más viejo, y Flash-Lite de reserva */
+  function pickGemModels(list){
+    var flash = [], lite = [], alias = [];
+    (list || []).forEach(function(m){
+      var id = String((m && m.name) || "").replace(/^models\//, "");
+      if (((m && m.supportedGenerationMethods) || []).indexOf("generateContent") < 0) return;
+      var r = id.match(/^gemini-(\d+(?:\.\d+)?)-flash(-lite)?$/);
+      if (r) (r[2] ? lite : flash).push({ id: id, v: parseFloat(r[1]) });
+      else if (/^gemini-flash(-lite)?-latest$/.test(id)) alias.push(id);
+    });
+    function byV(a, b){ return b.v - a.v; }
+    function ids(a){ return a.map(function(x){ return x.id; }); }
+    flash.sort(byV); lite.sort(byV);
+    var out = ids(flash.slice(0, 3))
+      .concat(alias.filter(function(a){ return a.indexOf("lite") < 0; }))
+      .concat(ids(lite.slice(0, 2)))
+      .concat(alias.filter(function(a){ return a.indexOf("lite") > -1; }));
+    return out.length ? out : null;
+  }
+
+  function gemError(status, body){
+    var er = (body && body.error) || {};
+    var e = new Error(er.message || ("HTTP " + status));
+    var det = JSON.stringify(er.details || []);
+    e.status = status || er.code || 0;
+    e.gstatus = er.status || "";
+    e.reason = (det.match(/"reason":\s*"([A-Z_]+)"/) || [])[1] || "";
+    e.daily = /PerDay/i.test(det) || /per day/i.test(e.message);
+    e.zero = /limit:\s*0(?!\d)/.test(e.message) || /"quotaValue":\s*"0"/.test(det);
+    var rd = det.match(/"retryDelay":\s*"(\d+(?:\.\d+)?)s"/);
+    e.retry = rd ? parseFloat(rd[1]) : 0;
+    return e;
+  }
+
+  var GEM_DAILY = "Se acabó el cupo gratis de Gemini por hoy; se renueva de madrugada, hora de Ecuador. Mientras tanto respondo con el manual.";
+  function gemErrorText(e){
+    var m = String((e && e.message) || "");
+    if (e.gem === "refused") return COPY.refused;
+    if (e.gem === "empty") return COPY.empty_completion;
+    if (e.gem === "quota") return e.daily ? GEM_DAILY : COPY.rate_limited;
+    if (e.reason === "API_KEY_INVALID" || /api key not valid/i.test(m))
+      return "Google rechazó la clave de Gemini. Revísala con el botón de IA, arriba a la derecha.";
+    if (/REFERRER|referer/i.test(e.reason + " " + m))
+      return "Tu clave de Gemini tiene restringidos los sitios web y no permite esta página. Quita la restricción o crea otra clave en aistudio.google.com/apikey.";
+    if (/location is not supported|not supported in your|country/i.test(m))
+      return "Google no ofrece Gemini gratis desde tu ubicación.";
+    if (e.status === 429 && e.zero)
+      return "Tu clave no tiene cupo gratis en los modelos de Gemini que probé. Vuelve a guardarla con el botón de IA para actualizar la lista.";
+    if (e.status === 429) return e.daily ? GEM_DAILY : COPY.rate_limited;
+    if (e.status === 403 || e.gstatus === "PERMISSION_DENIED")
+      return "Tu clave de Gemini no tiene permiso para usar la IA. Crea una nueva en aistudio.google.com/apikey.";
+    if (e.status === 404)
+      return "Ningún modelo gratis de Gemini respondió con tu clave. Vuelve a guardarla con el botón de IA para actualizar la lista.";
+    if (e.status >= 500) return "Gemini está saturado en este momento. Intenta en un rato.";
+    if (!e.status) return "No hay conexión con Gemini. Respondo con el manual.";
+    return "No pude consultar a Gemini: " + (m || e.status);
+  }
+
+  /* Gemini a veces responde con markdown; el chat es texto plano */
+  function plainAI(t){
+    return String(t || "")
+      .replace(/\*\*([^*\n]+)\*\*/g, "$1").replace(/__([^_\n]+)__/g, "$1")
+      .replace(/^[ \t]*#{1,6}[ \t]+/gm, "")
+      .replace(/^([ \t]*)[*•][ \t]+/gm, "$1- ")
+      .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,;:!?]|$)/g, "$1$2")
+      .replace(/`([^`\n]+)`/g, "$1");
+  }
+
+  async function streamGem(model, contents, deep, out, signal, st){
+    var cfg = { maxOutputTokens: deep ? 8192 : 4096 };
+    if (!gemNoThink[model] && (deep || !/lite/.test(model)))
+      cfg.thinkingConfig = { thinkingLevel: deep ? "medium" : "low" };
+    var res = await fetch(GEM_URL + "models/" + encodeURIComponent(model) + ":streamGenerateContent?alt=sse", {
+      method: "POST", signal: signal,
+      headers: { "content-type": "application/json", "x-goog-api-key": gemKey },
+      body: JSON.stringify({ systemInstruction: { parts: [{ text: iaInstr() }] },
+                             contents: contents, generationConfig: cfg })
+    });
+    if (!res.ok){
+      var body = null;
+      try { body = await res.json(); } catch (_){}
+      throw gemError(res.status, body);
+    }
+    var reader = res.body.getReader(), dec = new TextDecoder(), buf = "", fin = "", blocked = "";
+    function feed(chunk){
+      var data = chunk.split("\n").filter(function(l){ return l.indexOf("data:") === 0; })
+        .map(function(l){ return l.slice(5).replace(/^ /, ""); }).join("\n");
+      if (!data) return;
+      var ev;
+      try { ev = JSON.parse(data); } catch (_){ return; }
+      if (ev.error) throw gemError(ev.error.code || 500, ev);
+      if (ev.promptFeedback && ev.promptFeedback.blockReason) blocked = ev.promptFeedback.blockReason;
+      var c = ev.candidates && ev.candidates[0];
+      if (!c) return;
+      if (c.finishReason) fin = c.finishReason;
+      ((c.content && c.content.parts) || []).forEach(function(p){
+        if (p && !p.thought && typeof p.text === "string") st.text += p.text;
+      });
+      if (st.text){
+        out.classList.remove("dots");
+        out.textContent = plainAI(st.text);
+        chatlog.scrollTop = chatlog.scrollHeight;
+      }
+    }
+    for (;;){
+      var r = await reader.read();
+      if (r.done) break;
+      buf += dec.decode(r.value, { stream: true }).replace(/\r/g, "");
+      var parts = buf.split("\n\n");
+      buf = parts.pop();
+      for (var i = 0; i < parts.length; i++) feed(parts[i]);
+    }
+    if (buf.trim()) feed(buf);
+    return { fin: fin, blocked: blocked };
+  }
+
+  /* pregunta a Gemini con los extractos del manual; si un modelo no tiene cupo, prueba el siguiente */
+  async function askGemTurn(text, deepOf){
+    var base = deepOf || text;
+    var ctx = manualExcerpts(base);
+    var q = deepOf ? "Amplía con más detalle y ejemplos prácticos de venta tu respuesta sobre: «" + deepOf + "»" : text;
+    turns.push({ role: "user", content: q });
+    while (turns.length > 10 || (turns.length && turns[0].role !== "user")) turns.shift();
+    var aug = q + (ctx.text ? "\n\nEXTRACTOS DEL MANUAL:\n" + ctx.text
+                            : "\n\n(El manual no trae extractos relacionados con esta pregunta.)");
+    var contents = turns.slice(0, -1).map(function(t){
+      return { role: t.role === "assistant" ? "model" : "user", parts: [{ text: String(t.content).slice(0, 3000) }] };
+    }).concat([{ role: "user", parts: [{ text: aug }] }]);
+    var out = bubble("bot", deepOf ? "Pensando a fondo…" : "Pensando…");
+    out.classList.add("dots");
+    setBusy(true);
+    ctl = new AbortController();
+    var st = { text: "" }, res = null, last = null;
+    try {
+      var now = Date.now();
+      var models = gemModels().filter(function(m){ return !(gemCool[m] && gemCool[m].until > now); });
+      if (!models.length){
+        throw { gem: "quota", daily: Object.keys(gemCool).some(function(m){ return gemCool[m].daily && gemCool[m].until > now; }) };
+      }
+      for (var i = 0; i < models.length; i++){
+        var m = models[i];
+        try {
+          res = await streamGem(m, contents, !!deepOf, out, ctl.signal, st);
+          last = null;
+          break;
+        } catch (e){
+          if ((e && e.name === "AbortError") || ctl.signal.aborted) throw e;
+          last = e;
+          if (st.text) break;                                    /* ya hubo texto: se queda con eso */
+          if (e.status === 400 && /thinking/i.test(e.message) && !gemNoThink[m]){ gemNoThink[m] = 1; i--; continue; }
+          if (e.status === 429){
+            if (e.zero) dropGemModel(m);                         /* ese modelo no tiene cupo gratis */
+            else gemCool[m] = { until: Date.now() + (e.daily ? 3600e3 : Math.max(20, e.retry || 60) * 1e3), daily: e.daily };
+            continue;
+          }
+          if (e.status === 404 || (e.status === 400 && /model|not (found|supported)/i.test(e.message) && !/api key/i.test(e.message))){
+            dropGemModel(m);
+            continue;
+          }
+          if (e.status >= 500) continue;
+          break;                                                 /* clave, permisos, región o red: no sirve otro modelo */
+        }
+      }
+      if (last && !st.text) throw last;
+      var answer = plainAI(st.text).trim();
+      if (!answer) throw { gem: res && (res.blocked || /SAFETY|PROHIBITED|BLOCKLIST|SPII|RECITATION/.test(res.fin)) ? "refused" : "empty" };
+      if (last || (res && res.fin === "MAX_TOKENS")) answer += "…";
+      out.classList.remove("dots");
+      out.textContent = answer;
+      turns.push({ role: "assistant", content: answer });
+      if (ctx.top) addLink(out, ctx.top.go, ctx.top.sub);
+      addActs(out, base, { deep: !deepOf });
+    } catch (e){
+      turns.pop();
+      if ((e && e.name === "AbortError") || (ctl && ctl.signal.aborted)){
+        if (st.text){ out.classList.remove("dots"); out.textContent = plainAI(st.text).trim() + " …(detenido)"; }
+        else out.remove();
+      } else {
+        out.remove();
+        bubble("sys", gemErrorText(e || {}));
+        localReply(base);
+      }
+    } finally {
+      setBusy(false); ctl = null;
+      chatlog.scrollTop = chatlog.scrollHeight;
+    }
+  }
+
   /* panel de la clave */
   var ckey = document.getElementById("ckey"), cset = document.getElementById("cset"),
       ckeyin = document.getElementById("ckeyin"), ckeysave = document.getElementById("ckeysave"),
@@ -4885,11 +5099,13 @@
   function maskKey(k){ return k.slice(0, 10) + "…" + k.slice(-4); }
   function keyMsg(t, cls){ ckeyst.textContent = t || ""; ckeyst.className = "cset-st" + (cls ? " " + cls : ""); }
   function syncSet(){
-    ckeydel.hidden = !apiKey;
+    var k = apiKey || gemKey;
+    ckeydel.hidden = !k;
     ckeyin.value = "";
-    ckeyin.placeholder = apiKey ? maskKey(apiKey) : "sk-ant-…";
-    keyMsg(apiKey ? "Clave activa en este navegador: el chat busca en internet."
-                  : "Sin clave: el chat responde solo con el manual.", apiKey ? "ok" : "");
+    ckeyin.placeholder = k ? maskKey(k) : "Pega aquí tu clave (AIza…)";
+    keyMsg(apiKey ? "Clave de Claude activa en este navegador: el chat responde con IA y busca en internet."
+         : gemKey ? "Gemini activo en este navegador: el chat responde con IA gratis."
+         : "Sin clave: el chat responde con el texto del manual.", k ? "ok" : "");
   }
   function toggleSet(open){
     var on = typeof open === "boolean" ? open : cset.hidden;
@@ -4897,10 +5113,10 @@
     ckey.setAttribute("aria-expanded", on ? "true" : "false");
     if (on) syncSet();
   }
-  async function saveKey(){
-    var k = (ckeyin.value || "").replace(/\s+/g, "");
-    if (!k){ keyMsg("Pega la clave primero.", "err"); return; }
-    if (!/^sk-ant-[A-Za-z0-9_-]{20,}$/.test(k)){ keyMsg("Eso no parece una clave de Claude: empieza con sk-ant-.", "err"); return; }
+  function keptNote(kept){ return kept ? "" : " Ojo: este navegador no permite guardarla y se perderá al cerrar la página."; }
+
+  async function saveClaudeKey(k){
+    if (!/^sk-ant-[A-Za-z0-9_-]{20,}$/.test(k)){ keyMsg("Esa clave de Claude está incompleta. Cópiala de nuevo, completa.", "err"); return; }
     ckeysave.disabled = true;
     keyMsg("Verificando la clave…");
     var verdict = "unknown";
@@ -4910,12 +5126,46 @@
     } catch (_){}
     ckeysave.disabled = false;
     if (verdict === "bad"){ keyMsg("La Consola rechazó la clave. Cópiala de nuevo, completa.", "err"); return; }
-    apiKey = k;
+    apiKey = k; gemKey = ""; turns = [];
     var kept = storeKey(k);
+    lsSet(GEM_STORE, ""); lsSet(GEM_MODELS, "");
     setMode(); syncSet();
-    keyMsg((verdict === "ok" ? "Clave verificada y guardada." :
-            "Clave guardada. No pude verificarla ahora; se probará con la primera pregunta.") +
-           (kept ? "" : " Ojo: este navegador no permite guardarla y se perderá al cerrar la página."), "ok");
+    keyMsg((verdict === "ok" ? "Clave de Claude verificada y guardada: IA con búsqueda en internet." :
+            "Clave guardada. No pude verificarla ahora; se probará con la primera pregunta.") + keptNote(kept), "ok");
+  }
+
+  async function saveGemKey(k){
+    if (!/^[A-Za-z0-9_.-]{30,}$/.test(k)){ keyMsg("Eso no parece una clave de Gemini: empieza con AIza y tiene 39 caracteres.", "err"); return; }
+    ckeysave.disabled = true;
+    keyMsg("Verificando la clave con Google…");
+    var verdict = "unknown", models = null, why = "";
+    try {
+      var r = await fetch(GEM_URL + "models?pageSize=1000", { headers: { "x-goog-api-key": k } });
+      var body = null;
+      try { body = await r.json(); } catch (_){}
+      if (r.ok){ verdict = "ok"; models = pickGemModels(body && body.models); }
+      else {
+        var e = gemError(r.status, body);
+        if (e.reason === "API_KEY_INVALID" || /api key not valid/i.test(e.message)){
+          verdict = "bad"; why = "Google rechazó la clave. Cópiala completa desde aistudio.google.com/apikey y vuelve a pegarla.";
+        } else if (r.status === 403){ verdict = "bad"; why = gemErrorText(e); }
+      }
+    } catch (_){}
+    ckeysave.disabled = false;
+    if (verdict === "bad"){ keyMsg(why, "err"); return; }
+    gemKey = k; apiKey = ""; turns = []; gemCool = {}; gemNoThink = {};
+    var kept = lsSet(GEM_STORE, k);
+    storeKey("");
+    lsSet(GEM_MODELS, models ? JSON.stringify(models) : "");
+    setMode(); syncSet();
+    keyMsg((verdict === "ok" ? "Listo: clave verificada. El chat ya responde con IA gratis" + (models ? " (" + models[0] + ")." : ".") :
+            "Clave guardada. No pude verificarla ahora; se probará con la primera pregunta.") + keptNote(kept), "ok");
+  }
+
+  function saveKey(){
+    var k = (ckeyin.value || "").replace(/\s+/g, "");
+    if (!k){ keyMsg("Pega la clave primero.", "err"); return; }
+    return /^sk-ant-/.test(k) ? saveClaudeKey(k) : saveGemKey(k);
   }
   if (IN_CLAUDE) ckey.hidden = true;
   ckey.addEventListener("click", function(){ toggleSet(); });
@@ -4923,10 +5173,13 @@
   ckeysave.addEventListener("click", saveKey);
   ckeyin.addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); saveKey(); } });
   ckeydel.addEventListener("click", function(){
-    apiKey = ""; storeKey(""); turns = [];
+    apiKey = ""; gemKey = ""; turns = []; gemCool = {};
+    storeKey(""); lsSet(GEM_STORE, ""); lsSet(GEM_MODELS, "");
     setMode(); syncSet();
     keyMsg("Clave borrada de este navegador. El chat vuelve al modo Manual.");
   });
+  var chintgo = document.getElementById("chintgo");
+  if (chintgo) chintgo.addEventListener("click", function(){ toggleSet(true); cset.scrollTop = 0; });
   setMode();
 
   function openChat(){
@@ -5043,6 +5296,8 @@
     { a: "freno", intro: "frenos", qa: "dot 3 4 5.1 liquido de freno" },
     { a: "bateria|acumulador", intro: "baterias", qa: "bateria baterias ah cca" },
     { a: "bujia", intro: "bujias", qa: "bujia bujias cobre platino" },
+    { a: "sintetico|aceite sintetico|semisintetico|aceite semisintetico|mineral|aceite mineral|base sintetica",
+      qa: "mineral semisintetico sintetico diferencia base tipos aceite" },
     { a: "aditivo", intro: "aditivos", qa: "aditivos detergente dispersante" }
   ];
   DEFS.forEach(function(d){ d.al = d.a.split("|").map(function(x){ return singAll(norm(x)); }); });
@@ -5076,7 +5331,10 @@
       if (t.length < 25) return false;
       out.push({ t: t, row: row });
       len += t.length;
-      return len > max;
+      if (len <= max) return false;
+      /* no cortar una tabla o lista a la mitad ("seis cosas" y salían cinco) */
+      var nx = el.nextElementSibling;
+      return !(nx && nx.tagName === el.tagName && (row || el.tagName === "LI") && len < max * 1.9);
     });
     return out.map(function(o, i){
       return (i === 0 ? "" : (o.row && out[i - 1].row ? "\n" : "\n\n")) + o.t;
@@ -5113,7 +5371,7 @@
   }
 
   function defAnswer(text){
-    var key = defTerm(prepQ(text));
+    var key = defTerm(fixQ(prepQ(text)).q);
     if (!key) return null;
     for (var i = 0; i < DEFS.length; i++) if (DEFS[i].al.indexOf(key) > -1) return buildDef(DEFS[i]);
     /* una respuesta del banco que define el término: "SAE es ...", "El cárter es ..." */
@@ -5132,32 +5390,114 @@
   function qWords(qs){
     return qs.split(/[^a-z0-9]+/).filter(function(w){ return w.length > 1 && STOP.indexOf(w) < 0; });
   }
+  /* v20: raíz de 5 letras para que "cambio" encuentre "cambia" */
+  function qStems(qs){
+    var st = {};
+    qs.split(/[^a-z0-9]+/).forEach(function(w){ if (w.length >= 5 && STOP.indexOf(w) < 0) st[w.slice(0, 5)] = 1; });
+    return st;
+  }
+  /* si la pregunta es de aceite, la respuesta tiene que hablar de aceite (no de refrigerante) */
+  var TOPICS = ["aceite|lubric[a-z]*", "refrigerante|anticongelante|coolant|radiador", "filtro", "grasa",
+    "freno|dot|pastilla", "bateria|acumulador", "bujia", "aditivo", "moto|motocicleta|scooter"]
+    .map(function(t){ return new RegExp("(^|[^a-z0-9])(?:" + t + ")s?([^a-z0-9]|$)"); });
+  function qTopics(qs){ return TOPICS.filter(function(re){ return re.test(qs); }); }
+  function onTopic(txt, tops){ return tops.every(function(re){ return re.test(txt); }); }
+
+  function scoreQA(e, qs, stems, tops){
+    if (e.rq && !e.rq.some(function(r){ return qs.indexOf(r) > -1; })) return 0;
+    var sc = 0;
+    e.kw.forEach(function(k){
+      var w = 3 / Math.sqrt(DF[k] || 1);
+      if (new RegExp("(^|[^a-z0-9])" + escRe(k) + "([^a-z0-9]|$)").test(qs)) sc += w;
+      else if (qs.indexOf(k) > -1) sc += w / 3;
+      else if (k.length >= 5 && stems[k.slice(0, 5)]) sc += w * 0.7;
+    });
+    if (sc && tops.length && !onTopic(e.nt || (e.nt = norm(e.k + " " + e.a)), tops)) sc *= 0.35;
+    return sc;
+  }
   function rankQA(qs){
+    var stems = qStems(qs), tops = qTopics(qs);
     return QA.map(function(e){
-      if (e.rq && !e.rq.some(function(r){ return qs.indexOf(r) > -1; })) return null;
-      var sc = 0;
-      e.kw.forEach(function(k){
-        var w = 3 / Math.sqrt(DF[k] || 1);
-        if (new RegExp("(^|[^a-z0-9])" + escRe(k) + "([^a-z0-9]|$)").test(qs)) sc += w;
-        else if (qs.indexOf(k) > -1) sc += w / 3;
-      });
+      var sc = scoreQA(e, qs, stems, tops);
       return sc > 0 ? { e: e, s: sc } : null;
     }).filter(Boolean).sort(function(a, b){ return b.s - a.s; });
   }
-  function rankParas(words){
+  function rankParas(words, qs){
+    var tops = qs ? qTopics(qs) : [];
     return pindex.map(function(it){
       var sc = 0;
       words.forEach(function(w){
         if (new RegExp("(^|[^a-z0-9])" + escRe(w)).test(it.text)) sc += 3;
         else if (it.text.indexOf(w) > -1) sc += 1;
       });
-      return { it: it, s: sc / (1 + Math.log(1 + it.text.length / 160)) };
+      sc = sc / (1 + Math.log(1 + it.text.length / 160));
+      if (sc && tops.length && !onTopic(it.text, tops)) sc *= 0.35;
+      return { it: it, s: sc };
     }).filter(function(x){ return x.s > 0; }).sort(function(a, b){ return b.s - a.s; });
+  }
+
+  /* vocabulario del manual: corrige faltas ("lubrcar") y detecta lo que el manual no tiene ("hilux") */
+  var VOC = null;
+  function vocab(){
+    if (VOC) return VOC;
+    VOC = { w: {}, p: {}, b: {} };
+    function add(t){
+      norm(t).split(/[^a-z0-9]+/).forEach(function(w){
+        if (w.length < 3 || /^\d/.test(w)) return;
+        w = sing(w);
+        if (!VOC.w[w]){
+          VOC.w[w] = 0;
+          for (var n = 4; n <= Math.min(8, w.length); n++) VOC.p[w.slice(0, n)] = 1;
+          var bk = w.charAt(0) + w.length;
+          (VOC.b[bk] = VOC.b[bk] || []).push(w);
+        }
+        VOC.w[w]++;
+      });
+    }
+    pindex.forEach(function(it){ add(it.raw); });
+    QA.forEach(function(e){ add(e.k + " " + e.a); });
+    Object.keys(GLOSS).forEach(function(k){ add(k + " " + GLOSS[k].text); });
+    add(CONTEXTO);
+    return VOC;
+  }
+  /* una letra de más, de menos, cambiada o dos letras invertidas */
+  function near1(a, b){
+    if (a === b) return true;
+    var la = a.length, lb = b.length, i = 0;
+    if (Math.abs(la - lb) > 1) return false;
+    while (i < la && i < lb && a.charAt(i) === b.charAt(i)) i++;
+    if (la === lb){
+      if (a.slice(i + 1) === b.slice(i + 1)) return true;
+      return a.charAt(i) === b.charAt(i + 1) && a.charAt(i + 1) === b.charAt(i) && a.slice(i + 2) === b.slice(i + 2);
+    }
+    return la > lb ? a.slice(i + 1) === b.slice(i) : a.slice(i) === b.slice(i + 1);
+  }
+  var NOT_UNK = ("hola buenas buenos gracias favor porfavor dime decime explicame ayudame quisiera necesito quiero " +
+    "sabes saber conoces podrias puedes puedo deberia debo tengo tienes usted ustedes alguien cosas ahora " +
+    "siempre nunca mejor peor bueno buena malo mala").split(" ");
+  /* terminaciones de verbo: "vendemos", "recomiendas" no son nombres raros, son el mismo idioma */
+  var VERB_END = /(amos|emos|imos|ando|iendo|aba|aban|abas|aria|eria|iria|arian|erian|irian|ara|era|iera|aran|eran|ieran|ado|ada|ados|adas|ido|ida|idos|idas|aron|ieron|aste|iste|ia|ian|ias|ar|er|ir|as|es|an|en|o)$/;
+  function fixQ(qn){
+    var V = vocab(), unk = [];
+    var q = qn.split(" ").map(function(w){
+      if (w.length < 5 || /\d/.test(w) || STOP.indexOf(w) > -1 || NOT_UNK.indexOf(w) > -1 || V.w[sing(w)]) return w;
+      var best = null, bc = 0;
+      for (var L = w.length - 1; w.length >= 6 && L <= w.length + 1; L++){
+        (V.b[w.charAt(0) + L] || []).forEach(function(v){
+          if (V.w[v] > bc && near1(w, v)){ best = v; bc = V.w[v]; }
+        });
+      }
+      if (best) return best;
+      var s = sing(w);
+      if (!VERB_END.test(w) && !V.p[s.slice(0, Math.max(4, Math.min(8, s.length - 2)))]) unk.push(w);
+      return w;
+    }).join(" ");
+    return { q: q, unk: unk };
   }
 
   /* lo que la IA recibe del manual con cada pregunta */
   function manualExcerpts(text){
-    var qs = qForm(prepQ(text)), words = qWords(qs);
+    var qs = qForm(fixQ(prepQ(text)).q), words = qWords(qs);
     var out = [], seen = {}, total = 0, top = null;
     function add(label, body, go, sub, strong){
       body = (body || "").trim();
@@ -5176,7 +5516,7 @@
     rankQA(qs).slice(0, 3).forEach(function(x){
       if (x.s >= 1) add("Respuesta del manual", x.e.a, x.e.go, x.e.sub, x.s >= 2);
     });
-    rankParas(words).slice(0, 5).forEach(function(x){
+    rankParas(words, qs).slice(0, 5).forEach(function(x){
       if (x.s >= 1.4) add(x.it.theme + " \u203A " + x.it.title, x.it.raw, x.it.go, x.it.sub, x.s >= 3);
     });
     return { text: out.join("\n\n"), top: top };
@@ -5189,6 +5529,8 @@
     "- Nunca inventes datos internos de Austrofil (precios, stock, códigos, márgenes, clientes). Si no están en los extractos, dilo.",
     "- No tienes internet: si algo depende de datos actuales (precios de mercado, lanzamientos, noticias), dilo y sugiere buscarlo.",
     "- Las preguntas pueden venir abreviadas o con faltas (\"q es\" = qué es): interprétalas con sentido común.",
+    "- Ve directo a la respuesta, sin saludos ni rodeos: primero lo que preguntan, después el detalle útil para vender.",
+    "- Si depende de un vehículo concreto (marca, modelo, año, motor), da la recomendación típica y recuerda confirmarla en el manual del fabricante.",
     "- Texto plano, sin markdown: nada de asteriscos, # ni tablas. Para listas usa guiones."
   ].join("\n");
   function iaInstr(){
@@ -5196,11 +5538,11 @@
     return CONTEXTO + "\n\n" + IA_REGLAS + "\nFECHA: hoy es " + hoy + ".";
   }
 
-  /* botones bajo una respuesta: Más a fondo · Preguntar a la IA · Buscar en Google */
+  /* botones bajo una respuesta: Más a fondo · Activar IA gratis · Buscar en Google */
   function addActs(el, question, opt){
     var row = document.createElement("div");
     row.className = "acts";
-    if (opt.deep && sampleFn){
+    if (opt.deep && (gemKey || sampleFn)){
       var b = document.createElement("button");
       b.className = "chip ia";
       b.textContent = "Más a fondo";
@@ -5208,15 +5550,22 @@
         if (busy) return;
         b.disabled = true;
         bubble("me", "Más a fondo");
-        askSampleTurn(null, question);
+        if (gemKey) askGemTurn(null, question); else askSampleTurn(null, question);
       });
       row.appendChild(b);
+    }
+    if (opt.setup){
+      var s = document.createElement("button");
+      s.className = "chip ia";
+      s.textContent = "Activar IA gratis";
+      s.addEventListener("click", function(){ toggleSet(true); cset.scrollTop = 0; });
+      row.appendChild(s);
     }
     if (opt.claude){
       var c = document.createElement("a");
       c.className = "chip ia";
       c.href = CLAUDE_URL; c.target = "_blank"; c.rel = "noopener";
-      c.textContent = "Preguntar a la IA \u2197";
+      c.textContent = "Preguntar a la IA ↗";
       c.title = "Abre el manual en Claude: IA gratis con tu cuenta";
       row.appendChild(c);
     }
@@ -5224,17 +5573,62 @@
     g.className = "chip";
     g.href = "https://www.google.com/search?q=" + encodeURIComponent(question);
     g.target = "_blank"; g.rel = "noopener noreferrer";
-    g.textContent = "Buscar en Google \u2197";
+    g.textContent = "Buscar en Google ↗";
     row.appendChild(g);
     el.appendChild(row);
     chatlog.scrollTop = chatlog.scrollHeight;
   }
 
+  var PRECIO_RE = /(^| )(cuanto (cuesta|cuestan|vale|valen|sale|salen)|precio (de|del)|precios (de|del)|lista de precio|stock|inventario|hay en bodega)( |$)/;
+
+  /* "¿qué filtro lleva un Corolla?": el manual no tiene aplicaciones por modelo de vehículo */
+  var APLIC_PROD = /^(aceite|filtro|grasa|liquido|bateria|bujia|refrigerante|anticongelante|lubricante|pastilla|llanta)s?$/;
+  var APLIC_VERB = /^(lleva|llevan|usa|usan|uso|usar|pongo|pone|poner|ponerle|echo|echar|necesita|necesito|va|van|recomiendas|recomienda|recomiendan|sirve|sirven|compro|compra)$/;
+  var APLIC_SKIP = "a al el la los las un una unos unas mi mis su sus tu tus para en de del le les lo se que pa por con".split(" ");
+  var APLIC_GEN = ("moto carro auto camioneta taxi camion bus buseta motor vehiculo turbo hibrido scooter diesel gasolina " +
+    "maquina maquinaria tractor volqueta furgoneta jeep clima altura ciudad carretera invierno verano frio calor sierra " +
+    "costa oriente montana polvo lluvia trabajo uso cliente taller flota").split(" ");
+  function vehicleOf(q){
+    var t = q.split(" "), i, prod = -1, verb = -1, V = vocab();
+    for (i = 0; i < t.length && prod < 0; i++) if (APLIC_PROD.test(t[i])) prod = i;
+    if (prod < 0) return "";
+    for (i = prod + 1; i < t.length && verb < 0; i++) if (APLIC_VERB.test(t[i])) verb = i;
+    if (verb < 0) return "";
+    for (i = verb + 1; i < t.length; i++){
+      var w = t[i];
+      if (APLIC_SKIP.indexOf(w) > -1) continue;
+      if (w.length < 3 || /^\d+$/.test(w) || APLIC_GEN.indexOf(sing(w)) > -1 || APLIC_PROD.test(w) || V.w[sing(w)] >= 3) return "";
+      return w;
+    }
+    return "";
+  }
+  function cap(w){ return w.charAt(0).toUpperCase() + w.slice(1); }
+
   function localReply(text){
-    var r = defAnswer(text) || answerLocal(prepQ(text));
+    var pq = prepQ(text), fx = fixQ(pq);
+    var r, veh;
+    if (PRECIO_RE.test(fx.q)){
+      r = { text: "Precios y stock no están en el manual: consúltalos en el sistema o en la lista de precios vigente.", go: null, sub: null, lv: "nada" };
+    } else if ((veh = vehicleOf(pq))){
+      r = answerLocal(fx.q);
+      var gen = r.lv === "qa" && r.s >= 2;
+      r = { text: "El manual no tiene aplicaciones por modelo de vehículo («" + cap(veh) + "»): para eso manda el manual del fabricante o el catálogo del proveedor." +
+                  (gen ? "\n\nLo general:\n\n" + r.text : ""),
+            go: gen ? r.go : null, sub: gen ? r.sub : null, lv: "nada" };
+    } else {
+      r = defAnswer(text) || answerLocal(fx.q);
+      /* si la pregunta nombra algo que el manual no tiene (un término nuevo, una marca), no inventar */
+      if (fx.unk.length && r.lv !== "def" && !(r.lv === "qa" && r.s >= 3.5)){
+        var rel = r.lv === "qa";
+        r = { text: "No encuentro " + fx.unk.slice(0, 2).map(function(w){ return "«" + w + "»"; }).join(" ni ") +
+                    " en el manual, así que no te invento una respuesta." +
+                    (rel ? "\n\nLo más relacionado que sí tengo:\n\n" + r.text : ""),
+              go: rel ? r.go : null, sub: rel ? r.sub : null, lv: "nada" };
+      }
+    }
     var b = bubble("bot", r.text);
     addLink(b, r.go, r.sub);
-    if (r.lv !== "def" && r.lv !== "qa") addActs(b, text, { claude: !IN_CLAUDE });
+    if (r.lv !== "def" && r.lv !== "qa") addActs(b, text, { setup: !IN_CLAUDE && !apiKey && !gemKey && !sampleFn });
   }
 
   /* IA del plan de Claude (artefacto), con los extractos del manual */
@@ -5293,6 +5687,7 @@
 
     if (!cset.hidden) toggleSet(false);
     if (apiKey){ await askWebTurn(text); return; }
+    if (gemKey){ await askGemTurn(text, null); return; }
     if (!sampleFn){ localReply(text); return; }
     await askSampleTurn(text, null);
   }
